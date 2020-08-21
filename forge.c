@@ -134,11 +134,18 @@ void decrypt_and_read(bytes secret, bytes packet) {
 
 int main() {
 
-    // spec values https://tools.ietf.org/html/draft-ietf-tls-tls13-vectors-06
+    // draft values https://tools.ietf.org/html/draft-ietf-tls-tls13-vectors-06
     bytes traffic_secret = hex2bytes("e2f0db6a82e88280fc26f73c89854ee8615e25df28b2207962fa782226b23626");
     bytes packet = hex2bytes("17030300438c3497da00ae023e53c01b4324b665404c1b49e78fe2bf4d17f6348ae8340551e363a0cd05f2179c4fef5ad689b5cae0bae94adc63632e571fb79aa91544c6394d28a1");
 
     printf("\nReading spec example.\n");
+    decrypt_and_read(traffic_secret, packet);
+
+    // values from final RFC https://tools.ietf.org/html/rfc8448
+    traffic_secret = hex2bytes("2abbf2b8e381d23dbebe1dd2a7d16a8bf484cb4950d23fb7fb7fa8547062d9a1");
+    packet = hex2bytes("1703030043b1cebce242aa201be9ae5e1cb2a9aa4b33d4e866af1edb068919237741aa031d7a74d491c99b9d4e232b74206bc6fbaa04fe78be44a9b4f54320a17eb76992afac3103");
+
+    printf("\nReading RFC example.\n");
     decrypt_and_read(traffic_secret, packet);
 
     // Generated from client.go
