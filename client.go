@@ -6,35 +6,59 @@ import (
 	utls "github.com/refraction-networking/utls"
 )
 
+// Export for use in forge.c
+func export(name string, val interface{}) {
+	fmt.Printf("bytes %s = hex2bytes(\"%x\");\n", name, val)
+}
+
 func main() {
-	tcp, err := net.Dial("tcp", "tls13.refraction.network:443")
+	server := "tls13.refraction.network"
+	tcp, err := net.Dial("tcp", fmt.Sprintf("%s:443", server))
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer tcp.Close()
 
-	config := utls.Config{ServerName: "tls13.refraction.network"}
+	config := utls.Config{ServerName: server}
 	tls := utls.UClient(tcp, &config, utls.HelloChrome_72)
 	tls.Handshake()
 
-	hs := tls.HandshakeState
+	// hs := tls.HandshakeState
 
-	fmt.Printf("unsigned char *master_secret = OPENSSL_hexstr2buf(\"%x\", NULL);\n", hs.MasterSecret)
-	fmt.Printf("unsigned char *client_random = OPENSSL_hexstr2buf(\"%x\", NULL);\n", hs.Hello.Random)
-	fmt.Printf("unsigned char *server_random = OPENSSL_hexstr2buf(\"%x\", NULL);\n", hs.ServerHello.Random)
-	fmt.Printf("unsigned char *transcript_hash = OPENSSL_hexstr2buf(\"%x\", NULL);\n", hs.State13.Transcript.Sum([]byte{}))
-	fmt.Printf("unsigned char *traffic_secret = OPENSSL_hexstr2buf(\"%x\", NULL);\n", hs.State13.TrafficSecret)
+	// export("ciphersuite", hs.State13.Suite)
+	// export("master_secret", hs.MasterSecret)
+	// export("client_random", hs.Hello.Random)
+	// export("server_random", hs.ServerHello.Random)
+	// export("transcript_hash", hs.State13.Transcript.Sum([]byte{}))
+	export("traffic_secret", tls.Secret())
 
+	// Generate the byte sequence from the spec example
+	payload := make([]byte, 50)
+	for i := 0; i < 50; i++ {
+		payload[i] = byte(i)
+	}
 
-	req := []byte(`GET / HTTP/1.1
-Host: tls13.refractin.network`)
-	req_header := []byte{17, 03, 03, 0, byte(len(req))}
-	req = append(req_header, req...)
+	// Add TLS header. Length will be added by encryption function
+	rec_header := []byte{0x17, 0x03, 0x03, 0, 0}
+	rec := append(rec_header, payload...)
 
-
-	record, err := tls.Encrypt([]byte(req))
+	record, err := tls.Encrypt([]byte(rec))
 	if err != nil {
 		fmt.Println("Something went wrong")
 	}
-	fmt.Printf("unsigned char *packet = OPENSSL_hexstr2buf(\"%x\", NULL);\n", record)
+	export("packet", record)
 }
+
+// To run, this script requires the following methods in uTLS u_conn.go
+//
+// func (u UConn) Encrypt(payload []byte) ([]byte, error) {
+// 	return u.out.encrypt([]byte{}, payload, u.config.rand())
+// }
+//
+// func (u UConn) Secret() []byte {
+// 	if len(u.HandshakeState.State13.TrafficSecret) > 0 {
+// 		return u.HandshakeState.State13.TrafficSecret
+// 	} else {
+// 		return u.in.trafficSecret
+// 	}
+// }

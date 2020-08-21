@@ -13,8 +13,11 @@ run: forge
 
 all: clean forge
 
+clean:
+	rm forge
+
 debug: forge
-	gdb ./forge --directory=$(realpath ../station/openssl/)
+	gdb ./forge --directory=./openssl -x gdb_init
 	rm forge
 
 build-openssl:
