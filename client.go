@@ -11,6 +11,20 @@ func export(name string, val interface{}) {
 	fmt.Printf("bytes %s = hex2bytes(\"%x\");\n", name, val)
 }
 
+func testClient(tls *utls.UConn) {
+	request := []byte(`GET / HTTP/1.1
+Host: tls13.refraction.network
+Accept: text/html
+
+`)
+
+	fmt.Println(string(request))
+	tls.Write(request)
+	buf := make([]byte, 512)
+	tls.Read(buf)
+	fmt.Println(string(buf))
+}
+
 func main() {
 	server := "tls13.refraction.network"
 	tcp, err := net.Dial("tcp", fmt.Sprintf("%s:443", server))
@@ -22,6 +36,10 @@ func main() {
 	config := utls.Config{ServerName: server}
 	tls := utls.UClient(tcp, &config, utls.HelloChrome_72)
 	tls.Handshake()
+	defer tls.Close()
+
+	// testClient(tls)
+
 
 	// hs := tls.HandshakeState
 
