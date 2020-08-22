@@ -9,6 +9,14 @@ A simplified setup for testing Tapdance TLS forgery
   reach into opaque library objects
 * `openssl/` is included as a submodule for introspection and to lock the version
 
+## Building
+
+* Run `make build-openssl` to build the linked version of openssl with
+  debugging-friendly flags.
+* Run `make debug` to build and run forge with gdb.
+* `client.go` depends on some monkey-patched functions being added to
+  `u_conn.go` in the utls library to access private data. Details are in the
+  file.
 
 ## Problem
 
