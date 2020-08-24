@@ -149,11 +149,12 @@ int main() {
     decrypt_and_read(traffic_secret, packet);
 
     // Generated from client.go
-    traffic_secret = hex2bytes("15fc429fbc0efbe228a904e39bdd2882577968fc69758dcd41e96fddc63a91c8");
-    packet = hex2bytes("170303004350ffbbf24d25e42863cc89772390d0543eb75d967dfb7b47a45b4f9aa14ac9d3f330f363cd516e6415317a6248c9919176f3df3d3eb1796aa9b12c52b585448c548780");
+    traffic_secret = hex2bytes("a3ad003da74fe279562e25debfc7a71885af48c7124e37f61db555e84e54d349");
+    packet = hex2bytes("17030300430b06d55321168eb051caf995a078dc350e483b14e9f1def946f58460b39dca374cd4160aeadaf1d969be20b5e86debb7c6970bccdb9580eae3a5e46a3ebba4053301a4");
 
     printf("\nReading request from client.go.\n");
     decrypt_and_read(traffic_secret, packet);
+
 }
 
 // Don't mind the mess

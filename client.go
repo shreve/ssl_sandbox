@@ -57,10 +57,8 @@ func main() {
 	}
 
 	// Add TLS header. Length will be added by encryption function
-	rec_header := []byte{0x17, 0x03, 0x03, 0, 0}
-	rec := append(rec_header, payload...)
-
-	record, err := tls.Encrypt([]byte(rec))
+	header := []byte{0x17, 0x03, 0x03, 0, 0}
+	record, err := tls.Encrypt(header, payload)
 	if err != nil {
 		fmt.Println("Something went wrong")
 	}
@@ -69,8 +67,8 @@ func main() {
 
 // To run, this script requires the following methods in uTLS u_conn.go
 //
-// func (u UConn) Encrypt(payload []byte) ([]byte, error) {
-// 	return u.out.encrypt([]byte{}, payload, u.config.rand())
+// func (u UConn) Encrypt(header, payload []byte) ([]byte, error) {
+// 	return u.out.encrypt(header, payload, u.config.rand())
 // }
 //
 // func (u UConn) Secret() []byte {
